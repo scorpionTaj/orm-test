@@ -1,13 +1,13 @@
 package net.tajeddine.ormtest;
 
-import net.tajeddine.ormtest.entities.Product;
-import net.tajeddine.ormtest.repository.ProductRepository;
+import net.tajeddine.ormtest.entities.Patient;
+import net.tajeddine.ormtest.repository.PatientRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
-import java.util.List;
+import java.util.Date;
 
 @SpringBootApplication
 public class OrmTestApplication {
@@ -17,16 +17,30 @@ public class OrmTestApplication {
         SpringApplication.run(OrmTestApplication.class, args);
     }
     @Bean
-    CommandLineRunner start(ProductRepository productRepository) {
-        return args ->  {
-            Product p = Product.builder().name("Computer").price(5400).quantity(5).build();
-            productRepository.save(p);
-            productRepository.save(Product.builder().name("Printer").quantity(4).price(640).build());
-            productRepository.save(Product.builder().name("Smart Phone").quantity(34).price(1200).build());
-            List<Product> products = productRepository.findByNameContainsIgnoreCase("M");
-            products.forEach(prod -> {;
-                System.out.println(prod.toString());
-            });
+    CommandLineRunner start(PatientRepository patientRepository) {
+        return args -> {
+            // Ajouter des patients
+            patientRepository.save(new Patient(null, "Tajeddine Bourhim", new Date(), false, 75));
+            patientRepository.save(new Patient(null, "Ahmed test", new Date(), true, 90));
+
+            // Consulter tous les patients
+            patientRepository.findAll().forEach(System.out::println);
+
+            // Consulter un patient
+            Patient patient = patientRepository.findById(1L).orElse(null);
+            System.out.println(patient);
+
+            // Chercher des patients
+            patientRepository.findByMalade(true).forEach(System.out::println);
+
+            // Mettre à jour un patient
+            if (patient != null) {
+                patient.setScore(85);
+                patientRepository.save(patient);
+            }
+
+            // Supprimer un patient
+            patientRepository.deleteById(2L);
         };
     }
 }
